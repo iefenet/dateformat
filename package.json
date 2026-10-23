@@ -1,0 +1,53 @@
+{
+  "name": "@iefe/dateformat",
+  "version": "2.0.0",
+  "description": "框架无关的轻量日期工具：完全兼容旧版 format 调用约定，支持中文大写日期、相对天数偏移与年月天数查询。",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "license": "MIT",
+  "author": "iefe.net",
+  "keywords": [
+    "date",
+    "date-format",
+    "format",
+    "chinese-date",
+    "中文日期",
+    "时间格式化",
+    "framework-agnostic"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "peerDependencies": {},
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}
