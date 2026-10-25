@@ -1,6 +1,6 @@
 # @iefe/dateformat
 
-> 框架无关的轻量日期工具：**完全兼容旧版 `format` 调用约定**（老代码无需改动即可迁移），支持中文大写日期、相对天数偏移与年月天数查询。零框架依赖、可 tree-shaking、自带 TypeScript 类型。
+> 框架无关的轻量日期工具：**完全兼容旧版 `format` 调用约定**（老代码无需改动即可迁移），支持中文大写日期、相对天数偏移与年月天数查询。另提供 `datefmt` 冻结命名空间与不可变建造者，避免 `format` 等高频命名与业务代码冲突（变量污染）。零框架依赖、可 tree-shaking、自带 TypeScript 类型。
 
 ## 安装
 
@@ -87,6 +87,43 @@ pnpm add @iefe/dateformat
 
 - `getDays` 支持 `'YYYY-MM'`、`'YYYY-MM-DD'`、`'YYYY/MM'`、`'YYYY/MM/DD'` 与 `Date` 对象，只取年月
 - 三个方法**无参时一律以"今天"为基准**；非法入参回退默认值而非抛错（如 `getYearofDays('abc')` → 今年总天数，`getDays('abc')` → 本月天数）
+
+## 命名空间与建造者模式（避免变量污染）
+
+`format`、`getDays` 是前端最高频的命名之一，按名导入（`import { format } from '@iefe/dateformat'`）会把这些名字带进你的模块作用域，容易与业务代码自身或 date-fns 等库的同名导出互相覆盖。为此提供两种**零污染**用法（新代码推荐）：
+
+**1. 命名空间门面（Facade）—— 只导入一个标识符**
+
+```ts
+import { datefmt } from '@iefe/dateformat';
+
+datefmt.format('-7', 'YYYY-MM-DD'); // '2023-03-03'
+datefmt.getDays('2024-02');         // 29
+```
+
+`datefmt` 经 `Object.freeze` 冻结，运行时改写/挂载任何属性都会抛 `TypeError`，下游无法篡改。
+
+**2. 不可变建造者（Builder）—— 链式配置，无共享可变状态**
+
+```ts
+import { datefmt } from '@iefe/dateformat';
+
+datefmt.create('YYYY-MM-DD hh:ii:ss') // 工厂方法：以模板创建建造者
+  .offset(-7)                         // 偏移 -7 天（可叠加）
+  .render();                          // 产出字符串，假设今天 2023-03-10 → '2023-03-03 15:00:00'
+
+// 每一步都返回新实例，原实例与兄弟实例互不影响（无状态串扰）：
+const today = datefmt.create('YYYY-MM-DD');
+const lastWeek = today.offset(-7); // 新实例 → '2023-03-03'
+const nextWeek = today.offset(7);  // 新实例 → '2023-03-17'
+today.render();                    // '2023-03-10'（原实例未被修改）
+```
+
+- 链式方法 `pattern` / `offset` / `base` 均返回**新的**建造者实例；`offset` 支持叠加（`.offset(-7).offset('+3')` 等价净偏移 `-4`），数字与偏移字符串（如 `' -7 '`）均可；
+- 非法参数（如 `.offset('abc')`）按库约定**忽略不抛错**；
+- `render()` 为延迟求值（调用时才读系统时间），`toString()` 等价，可直接用于模板字符串 `` `${builder}` ``；
+- `base(date)` 可注入基准时间，便于测试固定时间；
+- 原有具名导出（`format` / `getDays`…）**完全保留**，老代码与 tree-shaking 行为不变——只是担心命名冲突时，改用 `datefmt` 一个入口即可。
 
 ## 快速开始
 

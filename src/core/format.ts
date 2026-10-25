@@ -9,8 +9,12 @@ export const DEFAULT_PATTERN = 'YYYY-MM-DD hh:ii:ss';
 
 /**
  * 按模板渲染日期：单次正则从长到短匹配 token，未知片段原样保留（需求 5.2）。
+ *
+ * @param pattern - 格式化模板
+ * @param date - 已偏移完成的基准日期
+ * @internal 供 {@link DateFmt} 建造者复用，不对外承诺稳定性
  */
-function render(pattern: string, date: Date): string {
+export function render(pattern: string, date: Date): string {
   const map = buildTokenMap(date);
   return pattern.replace(TOKEN_RE, (token) => map[token] ?? token);
 }
