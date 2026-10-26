@@ -1,10 +1,15 @@
 {
   "name": "@iefe/dateformat",
-  "version": "2.0.0",
-  "description": "框架无关的轻量日期工具：完全兼容旧版 format 调用约定，支持中文大写日期、相对天数偏移与年月天数查询。",
+  "version": "2.0.1",
+  "description": "轻量零依赖的日期格式化工具：兼容旧版 format 约定，支持中文大写日期、天数偏移与年月天数查询，datefmt 命名空间 + Builder 链式调用避免变量污染",
+  "repository": { 
+    "type": "git", 
+    "url": "git+https://github.com/iefenet/dateformat.git" 
+  },
+  "homepage":"www.iefe.net",
   "type": "module",
   "publishConfig": {
-    "access": "public"
+    "access": "public"  
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -23,7 +28,7 @@
   ],
   "sideEffects": false,
   "license": "MIT",
-  "author": "iefe.net",
+  "author": "www.iefe.net",
   "keywords": [
     "date",
     "date-format",
