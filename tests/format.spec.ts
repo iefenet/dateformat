@@ -110,7 +110,7 @@ describe('format —— 非法输入不抛错（7.1 补充）', () => {
   });
 
   it('未知 token 原样保留', () => {
-    expect(format('X YYYY')).toBe('X 2023');
+    expect(format('Z YYYY')).toBe('Z 2023');
   });
 });
 
@@ -248,5 +248,87 @@ describe('format —— 其余 token（YY / H / i / s / hh 24 小时制）', () 
   it('YYYY 不足四位时补零', () => {
     atTime(501, 3, 10, 15, 0, 0);
     expect(format('YYYY')).toBe('0501');
+  });
+});
+
+describe('format —— 扩展 token：SSS / DDD / ww / Q / x / X', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(BASE);
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('SSS：三位毫秒（不足补零）', () => {
+    vi.setSystemTime(new Date(2023, 2, 10, 15, 0, 0, 7));
+    expect(format('hh:ii:ss.SSS')).toBe('15:00:00.007');
+    vi.setSystemTime(new Date(2023, 2, 10, 15, 0, 0, 123));
+    expect(format('SSS')).toBe('123');
+  });
+
+  it('Q：季度 1~4', () => {
+    expect(format('Q季度')).toBe('1季度');
+    atTime(2023, 12, 10);
+    expect(format('Q')).toBe('4');
+    atTime(2023, 4, 1);
+    expect(format('Q')).toBe('2');
+  });
+
+  it('DDD：年内第几天（三位补零）', () => {
+    expect(format('DDD')).toBe('069'); // 31(1月) + 28(2月) + 10
+    atTime(2024, 2, 29);
+    expect(format('DDD')).toBe('060'); // 31 + 29（闰年）
+    atTime(2024, 1, 1);
+    expect(format('DDD')).toBe('001');
+    atTime(2023, 12, 31);
+    expect(format('DDD')).toBe('365');
+  });
+
+  it('ww：ISO 周数（周一开始、含当年首个周四的周为第 1 周）', () => {
+    expect(format('ww')).toBe('10'); // 2023-03-10 → 第 10 周
+    atTime(2023, 1, 4);
+    expect(format('ww')).toBe('01');
+    atTime(2023, 1, 1); // 2023-01-01 周日 → 属于 2022 年第 52 周
+    expect(format('ww')).toBe('52');
+    atTime(2024, 1, 1); // 2024-01-01 周一 → 2024 年第 1 周
+    expect(format('ww')).toBe('01');
+  });
+
+  it('x / X：Unix 时间戳（毫秒 / 秒）', () => {
+    expect(format('x')).toBe(String(BASE.getTime()));
+    expect(format('X')).toBe(String(Math.floor(BASE.getTime() / 1000)));
+  });
+});
+
+describe('format —— 字面量转义 [方括号]', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(BASE);
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('方括号内的内容不作为 token，脱括号原样输出', () => {
+    expect(format('[abc]')).toBe('abc');
+    expect(format('[YYYY]')).toBe('YYYY');
+    expect(format('[hh:ii:ss]')).toBe('hh:ii:ss');
+    expect(format('[a]')).toBe('a');
+  });
+
+  it('转义与 token 可在同一模板混用', () => {
+    expect(format('[今天是]EE')).toBe('今天是周五');
+    expect(format('[发表于] [YYYY] YYYY年')).toBe('发表于 YYYY 2023年');
+    expect(format('第Q季度[Q1]')).toBe('第1季度Q1');
+  });
+
+  it('未闭合的方括号不转义（维持原行为：括号原样、内部 token 照常替换）', () => {
+    expect(format('[EE')).toBe('[周五');
+  });
+
+  it('转义在 DateFmt 建造者中同样生效', () => {
+    // 'offset' 的 s 是秒 token，正是需要转义的典型场景
+    expect(format('off[s]et[-7]')).toBe('offset-7');
   });
 });

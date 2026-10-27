@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { getDays, getYearLastDays, getYearofDays } from '../src/index';
+import { getDays, getYearLastDays, getYearofDays, isLeapYear } from '../src/index';
 
 /** 基准日期：2023-03-10（平年，3 月 31 天），与需求 2.3 保持一致 */
 const BASE = new Date(2023, 2, 10, 15, 0, 0);
@@ -119,6 +119,20 @@ describe('helpers —— 7.2 补充：格式与边界', () => {
     expect(getYearofDays(2000)).toBe(366);
     expect(getYearofDays(1900)).toBe(365);
     expect(getYearofDays(' 2024 ')).toBe(366); // 允许首尾空格的字符串
+  });
+
+  it('isLeapYear 与 getYearofDays 的闰年判定一致', () => {
+    expect(isLeapYear(2024)).toBe(true);
+    expect(isLeapYear(2023)).toBe(false);
+    expect(isLeapYear(2000)).toBe(true); // 被 400 整除
+    expect(isLeapYear(1900)).toBe(false); // 被 100 整除但不被 400 整除
+    expect(isLeapYear('2024')).toBe(true); // 纯数字字符串
+  });
+
+  it('isLeapYear 缺省/非法回退今年（不抛错）', () => {
+    expect(isLeapYear()).toBe(false); // 基准 2023 平年
+    expect(isLeapYear('abc')).toBe(false);
+    expect(isLeapYear(Number.NaN)).toBe(false);
   });
 
   it.each([

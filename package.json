@@ -1,7 +1,7 @@
 {
   "name": "@iefe/dateformat",
-  "version": "2.0.1",
-  "description": "轻量零依赖的日期格式化工具：兼容旧版 format 约定，支持中文大写日期、天数偏移与年月天数查询，datefmt 命名空间 + Builder 链式调用避免变量污染",
+  "version": "2.1.0",
+  "description": "轻量零依赖的日期工具：兼容旧版 format 约定，支持中文大写日期、任意日期格式化 formatDate、相对时间 fromNow、日期差值 diff、iOS 兼容解析校验与日期比较，datefmt 命名空间 + Builder 链式调用避免变量污染",
   "repository": { 
     "type": "git", 
     "url": "git+https://github.com/iefenet/dateformat.git" 
@@ -36,6 +36,10 @@
     "chinese-date",
     "中文日期",
     "时间格式化",
+    "relative-time",
+    "from-now",
+    "date-diff",
+    "date-utils",
     "framework-agnostic"
   ],
   "engines": {

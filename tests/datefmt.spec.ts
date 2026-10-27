@@ -1,5 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { DateFmt, datefmt, format } from '../src/index';
+import {
+  DateFmt,
+  datefmt,
+  diff,
+  format,
+  formatDate,
+  fromNow,
+  isAfter,
+  isBefore,
+  isLeapYear,
+  isSameDay,
+  isToday,
+  isValid,
+  parseDate,
+} from '../src/index';
 
 /**
  * 基准时间：2023-03-10 15:00:00（星期五），与 format.spec.ts 保持一致。
@@ -21,6 +35,32 @@ describe('datefmt 命名空间（Facade 模式）', () => {
     expect(datefmt.getDays('2024-02')).toBe(29);
     expect(datefmt.getYearofDays(2024)).toBe(366);
     expect(datefmt.getYearLastDays()).toBe(296);
+  });
+
+  it('新功能同样收拢在命名空间上（与具名导出同源）', () => {
+    expect(datefmt.formatDate).toBe(formatDate);
+    expect(datefmt.parseDate).toBe(parseDate);
+    expect(datefmt.isValid).toBe(isValid);
+    expect(datefmt.fromNow).toBe(fromNow);
+    expect(datefmt.diff).toBe(diff);
+    expect(datefmt.isToday).toBe(isToday);
+    expect(datefmt.isSameDay).toBe(isSameDay);
+    expect(datefmt.isBefore).toBe(isBefore);
+    expect(datefmt.isAfter).toBe(isAfter);
+    expect(datefmt.isLeapYear).toBe(isLeapYear);
+  });
+
+  it('新功能在命名空间上可直接调用', () => {
+    expect(datefmt.formatDate('2024-02-29', 'YYYY-MM-DD')).toBe('2024-02-29');
+    expect(datefmt.fromNow('2023-03-10 14:30')).toBe('30 分钟前');
+    expect(datefmt.diff('2024-03-01', '2024-01-01')).toBe(60);
+    expect(datefmt.isValid('2023-02-29')).toBe(false);
+    expect(datefmt.parseDate('2024-02-29')).not.toBeNull();
+    expect(datefmt.isToday('2023-03-10')).toBe(true);
+    expect(datefmt.isSameDay('2023-03-10', '2023-03-10 23:00')).toBe(true);
+    expect(datefmt.isBefore('2023-03-09', '2023-03-10')).toBe(true);
+    expect(datefmt.isAfter('2023-03-11', '2023-03-10')).toBe(true);
+    expect(datefmt.isLeapYear(2024)).toBe(true);
   });
 
   it('命名空间已冻结：改写属性抛 TypeError（杜绝下游挂载/篡改）', () => {
@@ -110,5 +150,10 @@ describe('DateFmt 建造者（Builder 模式，不可变）', () => {
       '二零二三年三月三日 2023/03/03 下午',
     );
     expect(DateFmt.create('今天EE').render()).toBe('今天周五');
+  });
+
+  it('字面量转义与扩展 token 在建造者中同样可用', () => {
+    expect(DateFmt.create('[YYYY]-MM').render()).toBe('YYYY-03');
+    expect(DateFmt.create('第Q季度 第DDD天').offset(-10).render()).toBe('第1季度 第059天');
   });
 });

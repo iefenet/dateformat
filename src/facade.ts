@@ -1,6 +1,10 @@
 import { DateFmt } from './core/DateFmt';
 import { format } from './core/format';
-import { getDays, getYearLastDays, getYearofDays } from './helpers/dateInfo';
+import { isAfter, isBefore, isSameDay, isToday } from './helpers/compare';
+import { getDays, getYearLastDays, getYearofDays, isLeapYear } from './helpers/dateInfo';
+import { formatDate } from './helpers/formatDate';
+import { isValid, parseDate } from './helpers/parse';
+import { diff, fromNow } from './helpers/relative';
 
 /**
  * 命名空间门面（**Facade 模式**）：把全部能力收拢到**唯一一个**导入标识符上。
@@ -27,6 +31,36 @@ import { getDays, getYearLastDays, getYearofDays } from './helpers/dateInfo';
 export const datefmt = Object.freeze({
   /** {@link ../core/format!format | format}：旧版调用约定的格式化函数 */
   format,
+
+  /** {@link ../helpers/formatDate!formatDate | formatDate}：格式化任意日期 */
+  formatDate,
+
+  /** {@link ../helpers/parse!parseDate | parseDate}：解析日期字符串为 Date（iOS 兼容） */
+  parseDate,
+
+  /** {@link ../helpers/parse!isValid | isValid}：判断输入是否为合法日期 */
+  isValid,
+
+  /** {@link ../helpers/relative!fromNow | fromNow}：相对时间描述（'3 分钟前'） */
+  fromNow,
+
+  /** {@link ../helpers/relative!diff | diff}：两日期差值（a - b） */
+  diff,
+
+  /** {@link ../helpers/compare!isToday | isToday}：是否今天 */
+  isToday,
+
+  /** {@link ../helpers/compare!isSameDay | isSameDay}：是否同一天 */
+  isSameDay,
+
+  /** {@link ../helpers/compare!isBefore | isBefore}：a 是否早于 b */
+  isBefore,
+
+  /** {@link ../helpers/compare!isAfter | isAfter}：a 是否晚于 b */
+  isAfter,
+
+  /** {@link ../helpers/dateInfo!isLeapYear | isLeapYear}：是否闰年 */
+  isLeapYear,
 
   /** {@link ../helpers/dateInfo!getYearLastDays | getYearLastDays}：今年剩余天数（不含今天） */
   getYearLastDays,

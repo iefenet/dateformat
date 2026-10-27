@@ -6,13 +6,36 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 /**
  * 闰年规则（需求 5.5）：能被 4 整除且不能被 100 整除，或能被 400 整除。
  */
-function isLeapYear(year: number): boolean {
+function isLeap(year: number): boolean {
   return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 }
 
 /** 指定年份总天数：闰年 366，平年 365 */
 function daysInYear(year: number): number {
-  return isLeapYear(year) ? 366 : 365;
+  return isLeap(year) ? 366 : 365;
+}
+
+/**
+ * 判断指定年份是否为**闰年**（2 月有 29 天 / 全年 366 天）。
+ *
+ * 规则：能被 4 整除且不能被 100 整除，或能被 400 整除（`2000` 闰、`1900` 平）。
+ *
+ * @param year - 年份：`number`（如 `2024`）或纯数字字符串（如 `'2024'`）；
+ *               省略或非法（如 `'abc'`）时回退**今年**（不抛错）
+ * @param baseDate - @internal 内部参数：回退基准（默认 `new Date()`），便于测试固定时间
+ * @returns 闰年返回 `true`
+ *
+ * @example
+ * ```ts
+ * isLeapYear(2024)   // true
+ * isLeapYear(2023)   // false
+ * isLeapYear('2000') // true（被 400 整除）
+ * isLeapYear(1900)   // false（被 100 整除但不被 400 整除）
+ * ```
+ */
+export function isLeapYear(year?: YearInput, baseDate?: Date): boolean {
+  const base = resolveNow(baseDate);
+  return isLeap(parseYear(year, base));
 }
 
 /**

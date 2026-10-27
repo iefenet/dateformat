@@ -10,13 +10,20 @@ export const DEFAULT_PATTERN = 'YYYY-MM-DD hh:ii:ss';
 /**
  * 按模板渲染日期：单次正则从长到短匹配 token，未知片段原样保留（需求 5.2）。
  *
+ * 字面量转义：模板中 `[...]` 包裹的内容**不作为 token 替换**，脱去方括号原样输出
+ * （如 `'[abc]'` → `'abc'`、`'[YYYY]-MM'` → `'YYYY-03'`），
+ * 用于在模板中书写含 `a` / `i` / `s` 等单字母 token 的固定文案。
+ *
  * @param pattern - 格式化模板
  * @param date - 已偏移完成的基准日期
- * @internal 供 {@link DateFmt} 建造者复用，不对外承诺稳定性
+ * @internal 供 {@link DateFmt} 建造者与 {@link ../helpers/formatDate!formatDate} 复用，不对外承诺稳定性
  */
 export function render(pattern: string, date: Date): string {
   const map = buildTokenMap(date);
-  return pattern.replace(TOKEN_RE, (token) => map[token] ?? token);
+  return pattern.replace(TOKEN_RE, (token) => {
+    if (token.startsWith('[')) return token.slice(1, -1); // 转义片段：脱去方括号原样输出
+    return map[token] ?? token;
+  });
 }
 
 /**
